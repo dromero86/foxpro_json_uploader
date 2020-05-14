@@ -1,4 +1,4 @@
-import struct, datetime, decimal, itertools, re, json, os, requests, sys, logging
+import struct, datetime, decimal, itertools, re, json, os, requests, sys, logging, codecs
 reload(sys)
 sys.setdefaultencoding('utf-8')
  
@@ -21,7 +21,7 @@ def dbfreader(f):
 
     header = [field[0] for field in fields]
     column = [tuple(field[1:]) for field in fields]
- 
+    #print header, column
     while( f.read(1)== '\x00' ): pass
  
     fields.insert(0, ('DeletionFlag', 'C', 1, 0))
@@ -30,7 +30,8 @@ def dbfreader(f):
      
     for i in xrange(numrec):
  
-        xline    = f.read(fmtsiz).replace('\x00','') #
+        xline    = f.read(fmtsiz).decode('latin-1').encode('utf8') #
+        #print xline
         i        = 1
         line_pos = 0
         data     = {}
@@ -41,11 +42,16 @@ def dbfreader(f):
             col_name = header[i-1] 
  
             if type == 'N':  
-                data[col_name]= xline[line_pos: line_pos+size]  
+                try:
+                    data[col_name]= xline[line_pos: line_pos+size].strip()
+                except:
+                    #print col_name, xline[line_pos: line_pos+size].strip()
+                    data[col_name]=""
+
                 line_pos      = line_pos + size
 
             if type == 'C': 
-                data[col_name]= xline[line_pos:line_pos+size].decode('latin-1').encode('utf8').strip()
+                data[col_name]= xline[line_pos:line_pos+size].strip()
                 line_pos      = line_pos + size
 
             if type == 'D': 
@@ -62,6 +68,7 @@ def dbfreader(f):
                 line_pos      = line_pos + size
 
             i=i+1 
+            #print col_name,": ", data[col_name]
         export_data.append( json.dumps(data) ) 
     f.close() 
 
@@ -76,12 +83,11 @@ def get_dbf(file):
     else:
         logging.error("DataFile no found: %s" % file)
 
-    if(os.path.exists(file+".json")):
-        myfile = open(file+".json", 'w') 
-        myfile.write(d) 
-        myfile.close()
-    else:
-        logging.error("File JSON no found: %s" % file)
+ 
+    myfile = open(file+".json", 'w') 
+    myfile.write(d) 
+    myfile.close()
+ 
 
 def upload_data(url, file):
     logging.info("Upload json from %s" % file)
