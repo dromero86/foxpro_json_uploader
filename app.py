@@ -30,15 +30,14 @@ def dbfreader(f):
      
     for i in xrange(numrec):
  
-        xline    = f.read(fmtsiz).decode('latin-1').encode('utf8') #
-        #print xline
+        xline    = f.read(fmtsiz).decode('latin-1')#
         i        = 1
         line_pos = 0
         data     = {}
         
         for col in column:
             type = col[0]
-            size = col[1]
+            size = int(col[1])
             col_name = header[i-1] 
  
             if type == 'N':  

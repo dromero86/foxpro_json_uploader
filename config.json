@@ -1,5 +1,5 @@
 {
-	"folder_data" : "./source/",
-	"dbf_files": ["pempresa.dbf","familia.DBF","empresa.dbf"],
-	"host": "http://52.7.244.80/urgara/core/?action=sync-worker-upload-file"
+	"folder_data" : "/path/to/dbf/",
+	"dbf_files": ["TABLAFOX.dbf"],
+	"host": "http://mywebsiteupload.com"
 }
